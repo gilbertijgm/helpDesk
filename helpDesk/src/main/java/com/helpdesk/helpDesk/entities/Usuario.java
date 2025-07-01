@@ -9,7 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -23,15 +25,11 @@ public class Usuario {
     @Column(name = "id_usuario")
     private Long idUsuario;
 
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
+    @Column(unique = true)
+    private String username;
+    private String password;
 
     private String  email;
-
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
-
-    private boolean activo;
 
     // Tickets creados por el usuario (cliente)
     @OneToMany(mappedBy = "creadoPor", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -44,4 +42,23 @@ public class Usuario {
     @Column(name = "tickets_asignadosA")
     @JsonIgnore
     private List<Ticket> listaTicketsAsignadosA = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<RoleEntity> roles = new HashSet<>();
+
+    //atributos de springSecurity
+    @Column(name = "is_enables")
+    private boolean isEnabled;
+
+    @Column(name = "account_No_Expired")
+    private boolean accountNoExpired;
+
+    @Column(name = "account_No_Locked")
+    private boolean accountNoLocked;
+
+    @Column(name = "credential_No_Expired")
+    private boolean credentialNoExpired;
+
+
 }
