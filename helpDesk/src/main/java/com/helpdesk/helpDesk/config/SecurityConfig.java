@@ -50,7 +50,21 @@ public class SecurityConfig {
 
                     // ===== ENDPOINTS PRIVADOS (requieren roles) =====
                     http.requestMatchers(HttpMethod.POST, "/auth/signup")
-                            .hasAnyRole("ADMIN");                         // Solo accesible para rol admin
+                            .hasAnyRole("ADMIN");          // Solo accesible para rol admin
+
+                    // ==== ENDPOINT DE TICKETS ======
+                    http.requestMatchers(HttpMethod.POST, "/api/ticket/crear")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+
+                    // ==== ENDPOINT DE CATEGORIA ======
+                    http.requestMatchers(HttpMethod.GET, "/api/categoria/categorias")
+                            .permitAll();
+                    http.requestMatchers(HttpMethod.GET, "/api/categoria/categoria-id/{id}")
+                            .permitAll();
+                    http.requestMatchers(HttpMethod.POST, "/api/categoria/crear")
+                            .hasAnyRole("ADMIN");
+                    http.requestMatchers(HttpMethod.DELETE, "/api/categoria/eliminar/{id}")
+                            .hasAnyRole("ADMIN");
                 })
 
                 // Agrega un filtro personalizado que valida el JWT antes de que llegue al filtro básico de autenticación

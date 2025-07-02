@@ -33,4 +33,7 @@ public class Categoria {
     @Column(name = "categorias")
     @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
+
+
+
 }
