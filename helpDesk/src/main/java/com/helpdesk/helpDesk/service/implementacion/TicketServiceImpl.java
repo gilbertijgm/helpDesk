@@ -1,18 +1,27 @@
 package com.helpdesk.helpDesk.service.implementacion;
 
+import com.helpdesk.helpDesk.controller.dto.ticket.AsignarTecnicoDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
+import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
 import com.helpdesk.helpDesk.entities.Categoria;
+import com.helpdesk.helpDesk.entities.RoleEntity;
 import com.helpdesk.helpDesk.entities.Ticket;
 import com.helpdesk.helpDesk.entities.Usuario;
 import com.helpdesk.helpDesk.entities.enums.Estado;
+import com.helpdesk.helpDesk.entities.enums.Rol;
+import com.helpdesk.helpDesk.exceptions.ResourceNotFoundException;
+import com.helpdesk.helpDesk.exceptions.ServiceUtils;
 import com.helpdesk.helpDesk.persistence.ICategoriaDAO;
 import com.helpdesk.helpDesk.persistence.ITicketDAO;
 import com.helpdesk.helpDesk.repository.CategoriaRepository;
 import com.helpdesk.helpDesk.repository.UsuarioRepository;
+import com.helpdesk.helpDesk.response.ForbiddenAccessException;
 import com.helpdesk.helpDesk.service.ITicketService;
+import com.helpdesk.helpDesk.service.mappers.TicketMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +30,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,44 +39,88 @@ public class TicketServiceImpl implements ITicketService {
     private final CategoriaRepository categoriaRepository;
     private final ITicketDAO ticketDAO;
     private final ICategoriaDAO categoriaDAO;
+    private final TicketMapper ticketMapper;
+
+//    @Override
+//    public TicketResponse crearTicket(TicketCreateDTO ticketDTO) {
+//        Usuario usuario = getUsuarioAutenticado();
+//
+//            Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
+//                    .orElseThrow(() -> new UsernameNotFoundException("Categoria no encontrado"));
+//
+//
+//        LocalDateTime hoy = LocalDateTime.now();
+//
+//        Ticket ticket = Ticket.builder()
+//                .titulo(ticketDTO.getTitulo())
+//                .descripcion(ticketDTO.getDescripcion())
+//                .estado(Estado.ABIERTO)
+//                .prioridad(ticketDTO.getPrioridad())
+//                .fechaCreacion(hoy)
+//                .creadoPor(usuario)
+//                .categoria(categoria)
+//                .build();
+//
+//        ticket = ticketDAO.crearTicket(ticket);
+//
+//        return TicketResponse.builder()
+//                .idTicket(ticket.getIdTicket())
+//                .titulo(ticket.getTitulo())
+//                .descripcion(ticket.getDescripcion())
+//                .estado(ticket.getEstado())
+//                .prioridad(ticket.getPrioridad())
+//                .fechaCreacion(ticket.getFechaCreacion())
+//                .nombreUsuario(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)
+//                .nombreCategoria(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)
+//                .build();
+//    }
 
     @Override
     public TicketResponse crearTicket(TicketCreateDTO ticketDTO) {
+        // Obtenemos el usuario autenticado
         Usuario usuario = getUsuarioAutenticado();
 
-            Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
-                    .orElseThrow(() -> new UsernameNotFoundException("Categoria no encontrado"));
-
-
+        // Buscamos la categoría
+        Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
+                .orElseThrow(() -> new UsernameNotFoundException("Categoria no encontrado"));
+        //obtenemos la fecha de hoy
         LocalDateTime hoy = LocalDateTime.now();
 
-        Ticket ticket = Ticket.builder()
-                .titulo(ticketDTO.getTitulo())
-                .descripcion(ticketDTO.getDescripcion())
-                .estado(Estado.ABIERTO)
-                .prioridad(ticketDTO.getPrioridad())
-                .fechaCreacion(hoy)
-                .creadoPor(usuario)
-                .categoria(categoria)
-                .build();
+        // Usamos el mapper para convertir el DTO a entidad
+        Ticket ticket = ticketMapper.toEntity(ticketDTO);
 
+        // Completamos campos que no vienen en el DTO
+        ticket.setEstado(Estado.ABIERTO);
+        ticket.setFechaCreacion(hoy);
+        ticket.setCreadoPor(usuario);
+        ticket.setCategoria(categoria);
+
+        //Guardamos en la base de datos
         ticket = ticketDAO.crearTicket(ticket);
 
-        return TicketResponse.builder()
-                .idTicket(ticket.getIdTicket())
-                .titulo(ticket.getTitulo())
-                .descripcion(ticket.getDescripcion())
-                .estado(ticket.getEstado())
-                .prioridad(ticket.getPrioridad())
-                .fechaCreacion(ticket.getFechaCreacion())
-                .nombreUsuario(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)
-                .nombreCategoria(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)
-                .build();
-    }
+        return ticketMapper.toResponse(ticket);
 
+    }
     @Override
-    public TicketCreateDTO actualizarTicket(TicketCreateDTO ticket) {
-        return null;
+    public TicketResponse actualizarTicket(TicketCreateDTO ticketDTO, Long id) {
+       //buscamos el ticket a modificar por id recibido
+        Ticket ticket  = ticketDAO.ticketPorId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con el id: " + id));
+
+        // Buscamos la categoría que se desea asignar
+        Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
+                .orElseThrow(() -> new UsernameNotFoundException("Categoria no encontrado"));
+
+
+        //Mapeamos el dto recibido a la entidad, usando el metodo creado en el mapper
+        //Esta línea actualiza el objeto original sin crear uno nuevo.
+        // Es el enfoque más limpio, eficiente y seguro cuando querés actualizar parcialmente una entidad sin pisar todo.
+        ticketMapper.uddateEntityFromDto(ticketDTO, ticket);
+
+        //guadarmos la entidad actualizada
+        Ticket ticketUpdate = ticketDAO.actualizarTicket(ticket);
+
+        return ticketMapper.toResponse(ticketUpdate);
     }
 
     @Override
@@ -77,23 +129,58 @@ public class TicketServiceImpl implements ITicketService {
     }
 
     @Override
-    public TicketCreateDTO asignarTicketA(TicketCreateDTO ticket) {
-        return null;
+    public TicketResponse asignarTicketA(Long idTicket, AsignarTecnicoDTO asignarTecnicoDTO) {
+        //buscamos el ticket por id recibido
+        Ticket ticket  = ticketDAO.ticketPorId(idTicket)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con el id: " + idTicket));
+
+        //buscamo el usario por id recibio
+        Usuario usuario = usuarioRepository.findById(asignarTecnicoDTO.getIdTecnico())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con el id: " +asignarTecnicoDTO.getIdTecnico()));
+
+        //validar que usuario tenga rol de TECNICO
+        if (!usuario.tieneRol(Rol.TECNICO)){
+            throw new ForbiddenAccessException("El usuario no tiene rol de TECNICO");
+        }
+        ticket.setAsignadoA(usuario);
+        ticket = ticketDAO.asignarTicketA(ticket);
+
+        return ticketMapper.toResponse(ticket);
     }
 
     @Override
-    public List<TicketCreateDTO> listadoTicket() {
-        return List.of();
+    public List<TicketResponse> listadoTicket() {
+        //obetenemos los tickets
+        List<Ticket> lista = ticketDAO.listadoTicket();
+
+        //validamos si viene vacia la lista
+        ServiceUtils.validateNotEmpty(lista, "No hay tickets registrados");
+
+
+        return ticketMapper.toResponseList(lista);
     }
 
     @Override
-    public TicketCreateDTO ticketPorId(Long id) {
-        return null;
+    public TicketDTO ticketPorId(Long id) {
+        return ticketDAO.ticketPorId(id)
+                .map(ticketMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrada con el id: " + id));
     }
 
+    //String palabraClave, String estado, String prioridad, LocalDate fecha,
     @Override
-    public Page<TicketCreateDTO> tickets(String palabraClave, String estado, String prioridad, LocalDate fecha, Pageable pageable) {
-        return null;
+    public Page<TicketResponse> tickets(Pageable pageable) {
+        //obtengo el listado de tickets paginados
+        Page<Ticket> listadoPaginado = ticketDAO.tickets(pageable);
+
+        //Convertimos las entidades en DTO usando el mapper creado con .getContent() que trae solo las tareas y no la informacion de paginacion
+        List<TicketResponse> dtoList = ticketMapper.toResponseList(listadoPaginado.getContent());
+
+        //validamos si viene vacia la lista
+        ServiceUtils.validateNotEmpty(dtoList, "No hay tickets registrados");
+
+        // Retornamos un nuevo Page con los DTOs y la info de paginación original
+        return new PageImpl<>(dtoList, pageable, listadoPaginado.getTotalElements());
     }
 
     //Metodo para obetener del contexto el usuario logueado

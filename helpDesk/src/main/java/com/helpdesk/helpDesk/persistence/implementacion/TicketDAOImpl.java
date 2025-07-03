@@ -51,8 +51,12 @@ public class TicketDAOImpl implements ITicketDAO {
         return ticketRepository.findById(id);
     }
 
+    //String palabraClave, String estado, String prioridad, LocalDate fecha,
     @Override
-    public Page<Ticket> tickets(String palabraClave, String estado, String prioridad, LocalDate fecha, Pageable pageable) {
-        return null;
+    public Page<Ticket> tickets(Pageable pageable) {
+
+        Page<Ticket> lista = ticketRepository.findAll(pageable);
+
+        return lista;
     }
 }

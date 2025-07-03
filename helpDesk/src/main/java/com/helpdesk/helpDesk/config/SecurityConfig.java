@@ -55,6 +55,16 @@ public class SecurityConfig {
                     // ==== ENDPOINT DE TICKETS ======
                     http.requestMatchers(HttpMethod.POST, "/api/ticket/crear")
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.PUT, "/api/ticket/actualizar/{id}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.PATCH, "/api/ticket/asignarTecnico do/{id}")
+                            .hasAnyRole("ADMIN");
+                    http.requestMatchers(HttpMethod.GET, "/api/ticket/listado")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.GET, "/api/ticket/tickets")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.GET, "/api/ticket/ticket/{id}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
 
                     // ==== ENDPOINT DE CATEGORIA ======
                     http.requestMatchers(HttpMethod.GET, "/api/categoria/categorias")

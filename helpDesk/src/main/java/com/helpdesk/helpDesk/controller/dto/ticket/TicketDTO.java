@@ -1,10 +1,10 @@
 package com.helpdesk.helpDesk.controller.dto.ticket;
 
-import com.helpdesk.helpDesk.entities.Categoria;
 import com.helpdesk.helpDesk.entities.Usuario;
 import com.helpdesk.helpDesk.entities.enums.Estado;
 import com.helpdesk.helpDesk.entities.enums.Prioridad;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TicketResponse {
+public class TicketDTO {
 
     private Long idTicket;
 
@@ -33,8 +33,12 @@ public class TicketResponse {
 
     private LocalDateTime fechaCreacion;
 
+    private LocalDateTime fechaResolucion;
+
 
     private String nombreUsuario;
+
     private String tecnicoAsignado;
+
     private String nombreCategoria;
 }

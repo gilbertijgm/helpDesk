@@ -60,4 +60,10 @@ public class Usuario {
     private boolean credentialNoExpired;
 
 
+    //metodo para verficiar si un usuario tiene X rol
+    public boolean tieneRol(Rol rolBuscado){
+        return roles.stream()
+                .anyMatch(rol -> rol.getRoleEnum() == rolBuscado);
+    }
+
 }

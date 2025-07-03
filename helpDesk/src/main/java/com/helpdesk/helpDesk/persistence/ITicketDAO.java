@@ -29,5 +29,6 @@ public interface ITicketDAO {
     Optional<Ticket> ticketPorId(Long id);
 
     //metodo get para listar todas las tareas, implementando paginacion y filtrado dinamico
-    Page<Ticket> tickets(String palabraClave, String estado, String prioridad, LocalDate fecha, Pageable pageable);
+    Page<Ticket> tickets(Pageable pageable);
+    //String palabraClave, String estado, String prioridad, LocalDate fecha,
 }
