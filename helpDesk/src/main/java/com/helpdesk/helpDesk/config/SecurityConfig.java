@@ -3,6 +3,7 @@ package com.helpdesk.helpDesk.config;
 import com.helpdesk.helpDesk.config.filter.JwtTokenValidator;
 import com.helpdesk.helpDesk.service.UserDetailsServiceImpl;
 import com.helpdesk.helpDesk.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,6 +80,19 @@ public class SecurityConfig {
 
                 // Agrega un filtro personalizado que valida el JWT antes de que llegue al filtro básico de autenticación
                 .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
+                //excepciones personalizada para manejo respuestas 401 y 403
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"statusCode\":401,\"message\":\"No autenticado\",\"data\":null}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"statusCode\":403,\"message\":\"No tienes permisos para acceder a este recurso\",\"data\":null}");
+                        })
+                )
 
                 // Construye y devuelve el filtro configurado
                 .build();
