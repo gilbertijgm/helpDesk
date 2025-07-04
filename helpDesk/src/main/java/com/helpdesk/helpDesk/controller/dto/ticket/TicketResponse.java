@@ -33,6 +33,7 @@ public class TicketResponse {
 
     private LocalDateTime fechaCreacion;
 
+    private LocalDateTime fechaResolucion;
 
     private String nombreUsuario;
     private String tecnicoAsignado;

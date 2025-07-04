@@ -1,10 +1,7 @@
 package com.helpdesk.helpDesk.controller;
 
 
-import com.helpdesk.helpDesk.controller.dto.ticket.AsignarTecnicoDTO;
-import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
-import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
-import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
+import com.helpdesk.helpDesk.controller.dto.ticket.*;
 import com.helpdesk.helpDesk.response.ApiResponse;
 import com.helpdesk.helpDesk.response.PagedResponse;
 import com.helpdesk.helpDesk.response.Pagination;
@@ -53,6 +50,15 @@ public class TicketController {
         TicketResponse ticketResponse = ticketService.asignarTicketA(id, asignarTecnicoDTO);
 
         ApiResponse<TicketResponse> response = new ApiResponse<>(200, "Ticket Asignado con exito", ticketResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/actualizarEstado/{id}")
+    public ResponseEntity<?> asignarTenico(@PathVariable Long id, @RequestBody ActualizarEstadoDTO nuevoEstado)throws URISyntaxException{
+        TicketResponse ticketResponse = ticketService.actualizarEstado(id, nuevoEstado.getNuevoEstado());
+
+        ApiResponse<TicketResponse> response = new ApiResponse<>(200, "Estado actualizado con exito", ticketResponse);
 
         return ResponseEntity.ok(response);
     }

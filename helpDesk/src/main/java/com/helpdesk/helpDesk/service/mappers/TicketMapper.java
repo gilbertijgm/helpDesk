@@ -1,10 +1,8 @@
 package com.helpdesk.helpDesk.service.mappers;
 
-import com.helpdesk.helpDesk.controller.dto.categoria.CategoriaDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
-import com.helpdesk.helpDesk.entities.Categoria;
 import com.helpdesk.helpDesk.entities.Ticket;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,11 +20,13 @@ public interface TicketMapper {
     @Mapping(target = "nombreUsuario", expression = "java(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)")
     @Mapping(target = "nombreCategoria", expression = "java(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)")
     @Mapping(target = "tecnicoAsignado", expression = "java(ticket.getAsignadoA() != null ? ticket.getAsignadoA().getUsername() : null)")
+    @Mapping(target = "fechaResolucion", source = "fechaResolucion")
     TicketResponse toResponse(Ticket ticket);
 
     @Mapping(target = "nombreUsuario", expression = "java(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)")
     @Mapping(target = "nombreCategoria", expression = "java(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)")
     @Mapping(target = "tecnicoAsignado", expression = "java(ticket.getAsignadoA() != null ? ticket.getAsignadoA().getUsername() : null)")
+    @Mapping(target = "fechaResolucion", source = "fechaResolucion")
     TicketDTO toDto(Ticket ticket);
 
     // Convertir lista de tickets a lista de respuestas

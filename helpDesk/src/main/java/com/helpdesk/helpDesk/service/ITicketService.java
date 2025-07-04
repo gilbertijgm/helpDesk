@@ -18,7 +18,7 @@ public interface ITicketService {
     TicketResponse actualizarTicket(TicketCreateDTO ticket, Long idTecnico);
 
     //metodo patch para actualizar parcialmente un recurso, en este caso solo el estado
-    TicketCreateDTO actualizarEstado(TicketCreateDTO ticket);
+    TicketResponse actualizarEstado(Long idTicket, String nuevoEstado);
 
     //metodo patch para asignar el ticket a un agente
     TicketResponse asignarTicketA(Long idTicket, AsignarTecnicoDTO asignarTecnicoDTO);

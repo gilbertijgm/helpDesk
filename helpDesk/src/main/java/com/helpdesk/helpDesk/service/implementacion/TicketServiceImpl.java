@@ -124,8 +124,26 @@ public class TicketServiceImpl implements ITicketService {
     }
 
     @Override
-    public TicketCreateDTO actualizarEstado(TicketCreateDTO ticket) {
-        return null;
+    public TicketResponse actualizarEstado(Long idTicket, String nuevoEstado) {
+        //buscamos el ticket a modificar por id recibido
+        Ticket ticket  = ticketDAO.ticketPorId(idTicket)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con el id: " + idTicket));
+
+        LocalDateTime hoy = LocalDateTime.now();
+        Estado estadoEnum = Estado.valueOf(nuevoEstado);
+//        Validación:
+//        valueOf() lanza una excepción si el valor no coincide con ningún enum.
+        ticket.setEstado(estadoEnum);
+
+        if (estadoEnum == Estado.RESUELTO || estadoEnum == Estado.CERRADO){
+            ticket.setFechaResolucion(hoy);
+        }else {
+            ticket.setFechaResolucion(null);
+        }
+
+        Ticket ticketActulizado = ticketDAO.actualizarEstado(ticket);
+
+        return ticketMapper.toResponse(ticketActulizado);
     }
 
     @Override

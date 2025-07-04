@@ -60,6 +60,8 @@ public class SecurityConfig {
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
                     http.requestMatchers(HttpMethod.PATCH, "/api/ticket/asignarTecnico do/{id}")
                             .hasAnyRole("ADMIN");
+                    http.requestMatchers(HttpMethod.PATCH, "/api/ticket/actualizarEstado/{id}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
                     http.requestMatchers(HttpMethod.GET, "/api/ticket/listado")
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
                     http.requestMatchers(HttpMethod.GET, "/api/ticket/tickets")
