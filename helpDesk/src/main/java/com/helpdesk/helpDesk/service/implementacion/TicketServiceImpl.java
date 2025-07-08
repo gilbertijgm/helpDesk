@@ -187,9 +187,17 @@ public class TicketServiceImpl implements ITicketService {
 
     //String palabraClave, String estado, String prioridad, LocalDate fecha,
     @Override
-    public Page<TicketResponse> tickets(Pageable pageable) {
+    public Page<TicketResponse> tickets(Pageable pageable,
+                                        String palabraClave,
+                                        String estado,
+                                        String prioridad,
+                                        LocalDate fechaInicio,
+                                        LocalDate fechaFin,
+                                        Long idCreador,
+                                        Long idTecnico,
+                                        Long idCategoria) {
         //obtengo el listado de tickets paginados
-        Page<Ticket> listadoPaginado = ticketDAO.tickets(pageable);
+        Page<Ticket> listadoPaginado = ticketDAO.tickets(pageable,palabraClave,estado,prioridad,fechaInicio,fechaFin,idCreador,idTecnico,idCategoria);
 
         //Convertimos las entidades en DTO usando el mapper creado con .getContent() que trae solo las tareas y no la informacion de paginacion
         List<TicketResponse> dtoList = ticketMapper.toResponseList(listadoPaginado.getContent());

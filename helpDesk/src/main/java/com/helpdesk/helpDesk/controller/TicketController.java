@@ -11,11 +11,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public class TicketController {
     }
 
     @PatchMapping("/asignarTecnico/{id}")
-    public ResponseEntity<?> asignarTenico(@PathVariable Long id, @RequestBody AsignarTecnicoDTO asignarTecnicoDTO)throws URISyntaxException{
+    public ResponseEntity<?> asignarTecnico(@PathVariable Long id, @RequestBody AsignarTecnicoDTO asignarTecnicoDTO)throws URISyntaxException{
         TicketResponse ticketResponse = ticketService.asignarTicketA(id, asignarTecnicoDTO);
 
         ApiResponse<TicketResponse> response = new ApiResponse<>(200, "Ticket Asignado con exito", ticketResponse);
@@ -55,7 +57,7 @@ public class TicketController {
     }
 
     @PatchMapping("/actualizarEstado/{id}")
-    public ResponseEntity<?> asignarTenico(@PathVariable Long id, @RequestBody ActualizarEstadoDTO nuevoEstado)throws URISyntaxException{
+    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody ActualizarEstadoDTO nuevoEstado)throws URISyntaxException{
         TicketResponse ticketResponse = ticketService.actualizarEstado(id, nuevoEstado.getNuevoEstado());
 
         ApiResponse<TicketResponse> response = new ApiResponse<>(200, "Estado actualizado con exito", ticketResponse);
@@ -69,15 +71,27 @@ public class TicketController {
     }
 
     @GetMapping("/tickets")
-    public ResponseEntity<PagedResponse<TicketResponse>> tasks(@RequestParam(defaultValue = "0") int page, // Número de página (por defecto 0)
-                                                               @RequestParam(defaultValue = "5")int size,  // Tamaño de página (por defecto 5 elementos por página)
+    public ResponseEntity<PagedResponse<TicketResponse>> listarTickets(@RequestParam(defaultValue = "0") int page, // Número de página (por defecto 0)
+                                                               @RequestParam(defaultValue = "5")int size,// Tamaño de página (por defecto 5 elementos por página)
+                                                               @RequestParam(required = false) String palabraClave,
+                                                               @RequestParam(required = false) String estado,
+                                                               @RequestParam(required = false) String prioridad,
+                                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)  LocalDate fechaInicio,
+                                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+                                                               @RequestParam(required = false) Long idCreador,
+                                                               @RequestParam(required = false) Long idTecnico,
+                                                               @RequestParam(required = false) Long idCategoria,
                                                                HttpServletRequest request // Necesario para armar las URLs base en los enlaces
     ){
+        //validacion de parametros de entrada
+        int pageNumber = Math.max(0, page); //minimo de pagina 0
+        int pageSize = Math.min(Math.max(1, size), 100); //Maximo 100 resultados por pagina
+
         // Creamos un objeto Pageable con la página y el tamaño
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         //obtenemos la lista de tarea desde el servicio
-        Page<TicketResponse> pageResult = ticketService.tickets(pageable);
+        Page<TicketResponse> pageResult = ticketService.tickets(pageable,palabraClave,estado,prioridad,fechaInicio,fechaFin,idCreador,idTecnico,idCategoria);
 
         // Creamos el objeto con los datos de paginación
         Pagination pagination = new Pagination(
@@ -92,17 +106,21 @@ public class TicketController {
         // Obtenemos la URL base del request para construir los enlaces de navegación
         String baseUrl = request.getRequestURL().toString();
 
+        String queryParams = request.getQueryString() != null ? "&" + request.getQueryString().replaceAll("page=\\d+", "") : "";
+
         // Creamos un mapa con los enlaces tipo HATEOAS manuales (next, previous, first, last)
         Map<String, String> links = new LinkedHashMap<>();
-        links.put("firstPage", baseUrl + "?page=0&size=" + size);
-        links.put("lastPage", baseUrl + "?page=" + (pageResult.getTotalPages() - 1) + "&size=" + size);
-        links.put("nextPage", pageResult.hasNext() ? baseUrl + "?page=" + (page + 1) + "&size=" + size : null);
-        links.put("previousPage", pageResult.hasPrevious() ? baseUrl + "?page=" + (page - 1) + "&size=" + size : null);
+        links.put("firstPage", baseUrl + "?page=0&size=" + size + queryParams);
+        links.put("lastPage", baseUrl + "?page=" + (pageResult.getTotalPages() - 1) + "&size=" + size + queryParams);
+        links.put("nextPage", pageResult.hasNext() ? baseUrl + "?page=" + (page + 1) + "&size=" + size + queryParams : null);
+        links.put("previousPage", pageResult.hasPrevious() ? baseUrl + "?page=" + (page - 1) + "&size=" + size + queryParams : null);
 
+        //creamos mensaje personalizado
+        String mensaje = pageResult.getTotalElements() == 0 ? "No se encontraron tickets registrados" : "Listado de Tickets";
         // Creamos la respuesta final con todos los datos
         PagedResponse<TicketResponse> response = new PagedResponse<>(
                 200,                // Código HTTP
-                "Listado de Tareas",           // Mensaje
+                mensaje,           // Mensaje
                 pageResult.getContent(),       // Con .getContent() obtenés solo la lista de elementos sin los metadatos que trae Page.
                 pagination,                    // Info de paginación
                 links                          // Enlaces de navegación
