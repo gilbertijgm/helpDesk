@@ -47,8 +47,7 @@ public class TicketDAOImpl implements ITicketDAO {
     @Override
     public Optional<Ticket> ticketPorId(Long id) {
 
-
-        return ticketRepository.findById(id);
+        return ticketRepository.findByIdWithComentarios(id);
     }
 
     //String palabraClave, String estado, String prioridad, LocalDate fecha,

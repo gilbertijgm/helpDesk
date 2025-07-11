@@ -58,8 +58,7 @@ public class Ticket {
     private Categoria categoria;
 
     @OneToMany(mappedBy = "ticket",cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @Column(name = "comentarios")
-    @JsonIgnore
+        //@JsonIgnore
     private List<Comentario> comentarios = new ArrayList<>();
 
 }

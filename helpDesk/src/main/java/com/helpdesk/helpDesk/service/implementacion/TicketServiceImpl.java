@@ -1,13 +1,11 @@
 package com.helpdesk.helpDesk.service.implementacion;
 
+import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioResponseDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.AsignarTecnicoDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
-import com.helpdesk.helpDesk.entities.Categoria;
-import com.helpdesk.helpDesk.entities.RoleEntity;
-import com.helpdesk.helpDesk.entities.Ticket;
-import com.helpdesk.helpDesk.entities.Usuario;
+import com.helpdesk.helpDesk.entities.*;
 import com.helpdesk.helpDesk.entities.enums.Estado;
 import com.helpdesk.helpDesk.entities.enums.Rol;
 import com.helpdesk.helpDesk.exceptions.ResourceNotFoundException;
@@ -20,6 +18,7 @@ import com.helpdesk.helpDesk.response.ForbiddenAccessException;
 import com.helpdesk.helpDesk.service.ITicketService;
 import com.helpdesk.helpDesk.service.mappers.TicketMapper;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +35,6 @@ import java.util.List;
 public class TicketServiceImpl implements ITicketService {
 
     private final UsuarioRepository usuarioRepository;
-    private final CategoriaRepository categoriaRepository;
     private final ITicketDAO ticketDAO;
     private final ICategoriaDAO categoriaDAO;
     private final TicketMapper ticketMapper;
@@ -180,9 +178,17 @@ public class TicketServiceImpl implements ITicketService {
 
     @Override
     public TicketDTO ticketPorId(Long id) {
+        Ticket ticket = ticketDAO.ticketPorId(id).orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrada con el id: " + id));
+
+        ticket.getComentarios().forEach(c -> {
+            System.out.println("Comentario ID: " + c.getIdComentario());
+            System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
+        });
+
         return ticketDAO.ticketPorId(id)
                 .map(ticketMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrada con el id: " + id));
+
     }
 
     //String palabraClave, String estado, String prioridad, LocalDate fecha,

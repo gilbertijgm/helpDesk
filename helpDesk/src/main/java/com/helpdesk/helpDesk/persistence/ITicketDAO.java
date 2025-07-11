@@ -25,6 +25,7 @@ public interface ITicketDAO {
     //metodo get para listar todas las tareas
     List<Ticket> listadoTicket();
 
+
     //metodo get para buscar por id
     Optional<Ticket> ticketPorId(Long id);
 

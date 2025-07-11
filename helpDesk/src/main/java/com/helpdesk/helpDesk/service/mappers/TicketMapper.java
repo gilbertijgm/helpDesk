@@ -9,8 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
-
-@Mapper(componentModel = "spring")
+//
+@Mapper(componentModel = "spring", uses = {ComentarioMapper.class})
 public interface TicketMapper {
 
     // Convertir DTO de creación a entidad
@@ -27,6 +27,7 @@ public interface TicketMapper {
     @Mapping(target = "nombreCategoria", expression = "java(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)")
     @Mapping(target = "tecnicoAsignado", expression = "java(ticket.getAsignadoA() != null ? ticket.getAsignadoA().getUsername() : null)")
     @Mapping(target = "fechaResolucion", source = "fechaResolucion")
+    @Mapping(target = "comentarios", source = "comentarios")
     TicketDTO toDto(Ticket ticket);
 
     // Convertir lista de tickets a lista de respuestas

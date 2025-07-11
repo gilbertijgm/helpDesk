@@ -1,5 +1,6 @@
 package com.helpdesk.helpDesk.controller.dto.ticket;
 
+import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioResponseDTO;
 import com.helpdesk.helpDesk.entities.Usuario;
 import com.helpdesk.helpDesk.entities.enums.Estado;
 import com.helpdesk.helpDesk.entities.enums.Prioridad;
@@ -11,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -41,4 +43,6 @@ public class TicketDTO {
     private String tecnicoAsignado;
 
     private String nombreCategoria;
+
+    private List<ComentarioResponseDTO> comentarios;
 }

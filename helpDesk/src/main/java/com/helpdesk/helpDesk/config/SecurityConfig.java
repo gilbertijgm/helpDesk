@@ -69,6 +69,16 @@ public class SecurityConfig {
                     http.requestMatchers(HttpMethod.GET, "/api/ticket/ticket/{id}")
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
 
+                    // ==== ENDPOINT DE COMENTARIO ======
+                    http.requestMatchers(HttpMethod.POST, "/api/comentario/crear/{idTicket}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.PUT, "/api/comentario/modificar/{idComentario}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.DELETE, "/api/comentario/eliminar/{id}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+                    http.requestMatchers(HttpMethod.GET, "/api/comentario/byId/{id}")
+                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+
                     // ==== ENDPOINT DE CATEGORIA ======
                     http.requestMatchers(HttpMethod.GET, "/api/categoria/categorias")
                             .permitAll();
