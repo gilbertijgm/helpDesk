@@ -4,6 +4,7 @@ import com.helpdesk.helpDesk.controller.dto.ticket.AsignarTecnicoDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
+import com.helpdesk.helpDesk.entities.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -9,14 +9,14 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UsuarioMapper.class})
 public interface ComentarioMapper {
 
     // Convertir DTO de creación a entidad
     Comentario toEntity(ComentarioCreateDTO dto);
 
     // Convertir entidad a respuesta
-    @Mapping(target = "nombreAutor", expression = "java(comentario.getAutor() != null ? comentario.getAutor().getUsername() : null)")
+    @Mapping(source = "autor", target = "nombreUsuario")
     ComentarioResponseDTO toResponse(Comentario comentario);
 
 

@@ -1,5 +1,6 @@
 package com.helpdesk.helpDesk.controller.dto.comentario;
 
+import com.helpdesk.helpDesk.controller.dto.auth.UsuarioDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,5 +22,5 @@ public class ComentarioResponseDTO {
     private LocalDateTime fecha;
 
     // === Usuario que escribió el comentario (opcional pero recomendable)
-    private String nombreAutor;
+    private UsuarioDTO nombreUsuario;
 }

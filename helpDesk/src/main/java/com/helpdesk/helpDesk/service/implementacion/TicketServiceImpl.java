@@ -1,6 +1,5 @@
 package com.helpdesk.helpDesk.service.implementacion;
 
-import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioResponseDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.AsignarTecnicoDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketCreateDTO;
 import com.helpdesk.helpDesk.controller.dto.ticket.TicketDTO;
@@ -10,15 +9,14 @@ import com.helpdesk.helpDesk.entities.enums.Estado;
 import com.helpdesk.helpDesk.entities.enums.Rol;
 import com.helpdesk.helpDesk.exceptions.ResourceNotFoundException;
 import com.helpdesk.helpDesk.exceptions.ServiceUtils;
+import com.helpdesk.helpDesk.exceptions.UnauthorizedException;
 import com.helpdesk.helpDesk.persistence.ICategoriaDAO;
 import com.helpdesk.helpDesk.persistence.ITicketDAO;
-import com.helpdesk.helpDesk.repository.CategoriaRepository;
 import com.helpdesk.helpDesk.repository.UsuarioRepository;
-import com.helpdesk.helpDesk.response.ForbiddenAccessException;
+import com.helpdesk.helpDesk.exceptions.ForbiddenAccessException;
 import com.helpdesk.helpDesk.service.ITicketService;
 import com.helpdesk.helpDesk.service.mappers.TicketMapper;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -180,10 +178,25 @@ public class TicketServiceImpl implements ITicketService {
     public TicketDTO ticketPorId(Long id) {
         Ticket ticket = ticketDAO.ticketPorId(id).orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrada con el id: " + id));
 
-        ticket.getComentarios().forEach(c -> {
-            System.out.println("Comentario ID: " + c.getIdComentario());
-            System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
-        });
+//        ticket.getComentarios().forEach(c -> {
+//            System.out.println("Comentario ID: " + c.getIdComentario());
+//            System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
+//        });
+
+        Usuario usuario = getUsuarioAutenticado();
+
+
+        if (usuario.tieneRol(Rol.CLIENTE)) {
+            if (!ticket.getCreadoPor().getIdUsuario().equals(usuario.getIdUsuario())) {
+                throw new UnauthorizedException("No tienes permiso para ver este ticket.");
+            }
+        } else if (usuario.tieneRol(Rol.TECNICO)) {
+            if (ticket.getAsignadoA() == null ||
+                    !ticket.getAsignadoA().getIdUsuario().equals(usuario.getIdUsuario())) {
+                throw new UnauthorizedException("No tienes permiso para ver este ticket.");
+            }
+        }
+        // Si es ADMIN no se hace ninguna restricción
 
         return ticketDAO.ticketPorId(id)
                 .map(ticketMapper::toDto)
@@ -202,6 +215,19 @@ public class TicketServiceImpl implements ITicketService {
                                         Long idCreador,
                                         Long idTecnico,
                                         Long idCategoria) {
+        Usuario usuario = getUsuarioAutenticado();
+
+        // Determinar el rol y aplicar restricciones
+        if (usuario.tieneRol(Rol.CLIENTE)) {
+            // Cliente solo puede ver los tickets que él creó
+            idCreador = usuario.getIdUsuario(); // Reemplaza lo que venga por query param
+            idTecnico = null; // Evita que se apliquen otros filtros inadecuados
+        } else if (usuario.tieneRol(Rol.TECNICO)) {
+            // Técnico solo puede ver los tickets asignados a él
+            idTecnico = usuario.getIdUsuario();
+            idCreador = null;
+        }
+
         //obtengo el listado de tickets paginados
         Page<Ticket> listadoPaginado = ticketDAO.tickets(pageable,palabraClave,estado,prioridad,fechaInicio,fechaFin,idCreador,idTecnico,idCategoria);
 

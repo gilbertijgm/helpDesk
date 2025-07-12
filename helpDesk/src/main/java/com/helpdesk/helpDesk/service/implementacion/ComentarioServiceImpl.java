@@ -12,6 +12,9 @@ import com.helpdesk.helpDesk.repository.UsuarioRepository;
 import com.helpdesk.helpDesk.service.IComentarioService;
 import com.helpdesk.helpDesk.service.mappers.ComentarioMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -78,6 +81,8 @@ public class ComentarioServiceImpl implements IComentarioService {
 
         return comen;
     }
+
+
 
     @Override
     public List<ComentarioResponseDTO> listarComentarios() {

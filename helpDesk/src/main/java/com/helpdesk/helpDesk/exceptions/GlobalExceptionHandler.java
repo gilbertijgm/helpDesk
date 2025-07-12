@@ -1,7 +1,6 @@
-package com.helpdesk.helpDesk.response;
+package com.helpdesk.helpDesk.exceptions;
 
-import com.helpdesk.helpDesk.exceptions.NoContentException;
-import com.helpdesk.helpDesk.exceptions.ResourceNotFoundException;
+import com.helpdesk.helpDesk.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -152,5 +151,15 @@ public class GlobalExceptionHandler  {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+
+    /**
+     * Excepción personalizada para denegar acceso a recursos por falta de permisos.
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorized(UnauthorizedException ex) {
+        ApiResponse<Object> response = new ApiResponse<>(403, ex.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 }

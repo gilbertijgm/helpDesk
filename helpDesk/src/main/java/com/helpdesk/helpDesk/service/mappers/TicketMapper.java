@@ -10,24 +10,23 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 //
-@Mapper(componentModel = "spring", uses = {ComentarioMapper.class})
+@Mapper(componentModel = "spring", uses = {ComentarioMapper.class, CategoriaMapper.class, UsuarioMapper.class})
 public interface TicketMapper {
 
     // Convertir DTO de creación a entidad
     Ticket toEntity(TicketCreateDTO dto);
 
     // Convertir entidad a respuesta
-    @Mapping(target = "nombreUsuario", expression = "java(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)")
-    @Mapping(target = "nombreCategoria", expression = "java(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)")
-    @Mapping(target = "tecnicoAsignado", expression = "java(ticket.getAsignadoA() != null ? ticket.getAsignadoA().getUsername() : null)")
+    @Mapping(source = "creadoPor", target = "nombreUsuario")
+    @Mapping(source = "asignadoA", target = "tecnicoAsignado")
+    @Mapping(source = "categoria", target = "nombreCategoria")
     @Mapping(target = "fechaResolucion", source = "fechaResolucion")
     TicketResponse toResponse(Ticket ticket);
 
-    @Mapping(target = "nombreUsuario", expression = "java(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)")
-    @Mapping(target = "nombreCategoria", expression = "java(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)")
-    @Mapping(target = "tecnicoAsignado", expression = "java(ticket.getAsignadoA() != null ? ticket.getAsignadoA().getUsername() : null)")
-    @Mapping(target = "fechaResolucion", source = "fechaResolucion")
-    @Mapping(target = "comentarios", source = "comentarios")
+    // Convertir entidad a DTO completo (usado para detalle)
+    @Mapping(source = "creadoPor", target = "nombreUsuario")
+    @Mapping(source = "asignadoA", target = "tecnicoAsignado")
+    @Mapping(source = "categoria", target = "nombreCategoria")
     TicketDTO toDto(Ticket ticket);
 
     // Convertir lista de tickets a lista de respuestas

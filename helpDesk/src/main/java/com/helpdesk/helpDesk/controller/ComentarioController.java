@@ -2,14 +2,23 @@ package com.helpdesk.helpDesk.controller;
 
 import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioResponseDTO;
 import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioCreateDTO;
+import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
 import com.helpdesk.helpDesk.response.ApiResponse;
+import com.helpdesk.helpDesk.response.PagedResponse;
+import com.helpdesk.helpDesk.response.Pagination;
 import com.helpdesk.helpDesk.service.IComentarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comentario")
@@ -52,4 +61,6 @@ public class ComentarioController {
 
         return ResponseEntity.ok(comen);
     }
+
+
 }

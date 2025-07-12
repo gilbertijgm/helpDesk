@@ -66,4 +66,5 @@ public class Usuario {
                 .anyMatch(rol -> rol.getRoleEnum() == rolBuscado);
     }
 
+
 }

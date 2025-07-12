@@ -1,5 +1,7 @@
 package com.helpdesk.helpDesk.controller.dto.ticket;
 
+import com.helpdesk.helpDesk.controller.dto.auth.UsuarioDTO;
+import com.helpdesk.helpDesk.controller.dto.categoria.CategoriaDTO;
 import com.helpdesk.helpDesk.controller.dto.comentario.ComentarioResponseDTO;
 import com.helpdesk.helpDesk.entities.Usuario;
 import com.helpdesk.helpDesk.entities.enums.Estado;
@@ -38,11 +40,9 @@ public class TicketDTO {
     private LocalDateTime fechaResolucion;
 
 
-    private String nombreUsuario;
-
-    private String tecnicoAsignado;
-
-    private String nombreCategoria;
+    private UsuarioDTO nombreUsuario;
+    private UsuarioDTO tecnicoAsignado;
+    private CategoriaDTO nombreCategoria;
 
     private List<ComentarioResponseDTO> comentarios;
 }

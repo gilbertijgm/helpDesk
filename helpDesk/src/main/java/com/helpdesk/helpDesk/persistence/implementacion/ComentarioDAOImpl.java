@@ -4,6 +4,8 @@ import com.helpdesk.helpDesk.entities.Comentario;
 import com.helpdesk.helpDesk.persistence.IComentarioDAO;
 import com.helpdesk.helpDesk.repository.ComentarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,6 +30,7 @@ public class ComentarioDAOImpl implements IComentarioDAO {
 
         return comen;
     }
+
 
     @Override
     public Optional<Comentario> comentarioById(Long id) {
