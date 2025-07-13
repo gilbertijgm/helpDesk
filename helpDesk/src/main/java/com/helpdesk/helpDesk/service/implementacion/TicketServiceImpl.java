@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -178,10 +179,10 @@ public class TicketServiceImpl implements ITicketService {
     public TicketDTO ticketPorId(Long id) {
         Ticket ticket = ticketDAO.ticketPorId(id).orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrada con el id: " + id));
 
-//        ticket.getComentarios().forEach(c -> {
-//            System.out.println("Comentario ID: " + c.getIdComentario());
-//            System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
-//        });
+        ticket.getComentarios().forEach(c -> {
+            System.out.println("Comentario ID: " + c.getIdComentario());
+            System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
+        });
 
         Usuario usuario = getUsuarioAutenticado();
 
@@ -204,7 +205,6 @@ public class TicketServiceImpl implements ITicketService {
 
     }
 
-    //String palabraClave, String estado, String prioridad, LocalDate fecha,
     @Override
     public Page<TicketResponse> tickets(Pageable pageable,
                                         String palabraClave,
@@ -215,6 +215,7 @@ public class TicketServiceImpl implements ITicketService {
                                         Long idCreador,
                                         Long idTecnico,
                                         Long idCategoria) {
+
         Usuario usuario = getUsuarioAutenticado();
 
         // Determinar el rol y aplicar restricciones

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RequiredArgsConstructor // Genera constructor con los atributos finales (en este caso, jwtUtils)
-public class JwtTokenValidator extends OncePerRequestFilter {
+public class  JwtTokenValidator extends OncePerRequestFilter {
     // Clase personalizada que extiende OncePerRequestFilter: asegura que el filtro se ejecuta solo una vez por solicitud
 
     private final JwtUtil jwtUtils; // Utilidad encargada de validar y procesar el token JWT

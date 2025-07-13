@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -69,6 +70,8 @@ public class TicketController {
     public ResponseEntity<?> listado(){
         return ResponseEntity.ok(ticketService.listadoTicket());
     }
+
+
 
     @GetMapping("/tickets")
     public ResponseEntity<PagedResponse<TicketResponse>> listarTickets(@RequestParam(defaultValue = "0") int page, // Número de página (por defecto 0)
@@ -128,6 +131,7 @@ public class TicketController {
 
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/ticket/{id}")
     public ResponseEntity<ApiResponse<TicketDTO>> findById(@PathVariable Long id) {

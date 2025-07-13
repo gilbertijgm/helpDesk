@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration // Indicamos que esta clase define configuraciones para el contexto de Spring
 @EnableWebSecurity // Habilita la seguridad web en Spring Security
-@EnableMethodSecurity // Permite usar anotaciones como @PreAuthorize y @Secured a nivel de métodos
+@EnableMethodSecurity(prePostEnabled = true) // Permite usar anotaciones como @PreAuthorize y @Secured a nivel de métodos
 @RequiredArgsConstructor // Genera un constructor con todos los campos marcados como final
 public class SecurityConfig {
 

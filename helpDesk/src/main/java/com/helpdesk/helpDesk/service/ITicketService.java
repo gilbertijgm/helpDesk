@@ -7,6 +7,7 @@ import com.helpdesk.helpDesk.controller.dto.ticket.TicketResponse;
 import com.helpdesk.helpDesk.entities.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,9 +29,11 @@ public interface ITicketService {
     List<TicketResponse> listadoTicket();
 
     //metodo get para buscar por id
+
     TicketDTO ticketPorId(Long id);
 
     //metodo get para listar todas las tareas, implementando paginacion y filtrado dinamico
+
     Page<TicketResponse> tickets(
             Pageable pageable,
             String palabraClave,

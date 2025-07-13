@@ -9,6 +9,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 
@@ -36,7 +37,7 @@ public class JwtUtil {
         Algorithm algorithm = Algorithm.HMAC256(this.privateKey);
 
         // Obtenemos el nombre del usuario autenticado
-        String username = authentication.getPrincipal().toString();
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
 
         // Convertimos las autoridades a un string separado por comas
         String authorities = authentication.getAuthorities()

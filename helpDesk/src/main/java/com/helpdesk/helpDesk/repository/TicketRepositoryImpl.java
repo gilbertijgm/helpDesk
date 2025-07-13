@@ -113,9 +113,9 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
 
         // Builder para campo prioridad: ALTA = 1, MEDIA = 2, BAJA = 3
         Expression<Integer> prioridadOrdenada = cb.<Integer>selectCase()
-                .when(cb.equal(ticket.get("prioridad"), Prioridad.ALTA), 1)
-                .when(cb.equal(ticket.get("prioridad"), Prioridad.MEDIA), 2)
-                .when(cb.equal(ticket.get("prioridad"), Prioridad.BAJA), 3)
+                .when(cb.equal(ticket.get("prioridad"), Prioridad.CRITICA), 1)
+                .when(cb.equal(ticket.get("prioridad"), Prioridad.ALTA), 2)
+                .when(cb.equal(ticket.get("prioridad"), Prioridad.MEDIA), 3)
                 .otherwise(4);
 
         // Aplicamos orden por prioridad (ascendente → 1 primero = ALTA)
