@@ -16,6 +16,7 @@ import com.helpdesk.helpDesk.repository.UsuarioRepository;
 import com.helpdesk.helpDesk.exceptions.ForbiddenAccessException;
 import com.helpdesk.helpDesk.service.ITicketService;
 import com.helpdesk.helpDesk.service.mappers.TicketMapper;
+import com.helpdesk.helpDesk.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,44 +39,12 @@ public class TicketServiceImpl implements ITicketService {
     private final ICategoriaDAO categoriaDAO;
     private final TicketMapper ticketMapper;
 
-//    @Override
-//    public TicketResponse crearTicket(TicketCreateDTO ticketDTO) {
-//        Usuario usuario = getUsuarioAutenticado();
-//
-//            Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
-//                    .orElseThrow(() -> new UsernameNotFoundException("Categoria no encontrado"));
-//
-//
-//        LocalDateTime hoy = LocalDateTime.now();
-//
-//        Ticket ticket = Ticket.builder()
-//                .titulo(ticketDTO.getTitulo())
-//                .descripcion(ticketDTO.getDescripcion())
-//                .estado(Estado.ABIERTO)
-//                .prioridad(ticketDTO.getPrioridad())
-//                .fechaCreacion(hoy)
-//                .creadoPor(usuario)
-//                .categoria(categoria)
-//                .build();
-//
-//        ticket = ticketDAO.crearTicket(ticket);
-//
-//        return TicketResponse.builder()
-//                .idTicket(ticket.getIdTicket())
-//                .titulo(ticket.getTitulo())
-//                .descripcion(ticket.getDescripcion())
-//                .estado(ticket.getEstado())
-//                .prioridad(ticket.getPrioridad())
-//                .fechaCreacion(ticket.getFechaCreacion())
-//                .nombreUsuario(ticket.getCreadoPor() != null ? ticket.getCreadoPor().getUsername() : null)
-//                .nombreCategoria(ticket.getCategoria() != null ? ticket.getCategoria().getNombreCategoria() : null)
-//                .build();
-//    }
+
 
     @Override
     public TicketResponse crearTicket(TicketCreateDTO ticketDTO) {
         // Obtenemos el usuario autenticado
-        Usuario usuario = getUsuarioAutenticado();
+        Usuario usuario = AuthUtil.getUsuarioAutenticado();
 
         // Buscamos la categoría
         Categoria categoria = categoriaDAO.categoriaById(ticketDTO.getIdCategoria())
@@ -184,7 +153,7 @@ public class TicketServiceImpl implements ITicketService {
             System.out.println("Autor: " + (c.getAutor() != null ? c.getAutor().getUsername() : "NULL"));
         });
 
-        Usuario usuario = getUsuarioAutenticado();
+        Usuario usuario = AuthUtil.getUsuarioAutenticado();
 
 
         if (usuario.tieneRol(Rol.CLIENTE)) {
@@ -216,7 +185,7 @@ public class TicketServiceImpl implements ITicketService {
                                         Long idTecnico,
                                         Long idCategoria) {
 
-        Usuario usuario = getUsuarioAutenticado();
+        Usuario usuario = AuthUtil.getUsuarioAutenticado();
 
         // Determinar el rol y aplicar restricciones
         if (usuario.tieneRol(Rol.CLIENTE)) {

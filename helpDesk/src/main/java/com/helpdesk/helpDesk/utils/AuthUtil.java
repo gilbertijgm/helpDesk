@@ -22,7 +22,7 @@ public class AuthUtil {
     }
 
     //Metodo para obetener del contexto el usuario logueado
-    public Usuario getUsuarioAutenticado() {
+    public static Usuario getUsuarioAutenticado() {
         //obtenemos al usuario autenticado desde el contexto de Spring Security, así:
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
