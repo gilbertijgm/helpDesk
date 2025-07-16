@@ -1,6 +1,6 @@
 # 🗂️ HELP DESK - Sistema de Gestión de Tickets e incidentes
 
-**HELP DESK** es una API REST desarrollada con **Spring Boot**, diseñada para gestionar incidentes por medios de tickets. Tiene como funcion la creacion de ticket, listado de los mismos aplicando filtrado dinamicos, validaciones, seguridad y documentacion en Swagger. Incluye arquitectura en capas, manejo de errores y respuesta estructurada tipo `ApiResponse`.
+**HELP DESK** es una API REST desarrollada con **Spring Boot**, diseñada para gestionar y documentar incidentes por medios de tickets. Tiene como funcion la creacion de ticket, listado de los mismos aplicando filtrado dinamicos, validaciones, seguridad y documentacion en Swagger. Incluye arquitectura en capas, manejo de errores y respuesta estructurada tipo `ApiResponse`.
 
 ---
 #  Tabla de Contenidos
