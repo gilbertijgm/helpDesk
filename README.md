@@ -190,6 +190,44 @@ Estos filtros se aplican dinámicamente mediante Criteria API en el repositorio 
   - password: Campo requerido, no pueden estar vacíos.
   - email: Campo requerido, no pueden estar vacíos.
 ---
+## Seguridad
+
+Este proyecto implementa seguridad basada en JWT (JSON Web Token) utilizando Spring Security. El sistema maneja autenticación, autorización por roles y permisos específicos. A continuación, se describe el enfoque utilizado:
+
+🧾 Esquema de autenticación y autorización
+- Autenticación:
+  
+  Los usuarios se autentican mediante POST /auth/login, donde se valida el username y password. Si las credenciales son válidas, se genera un JWT que incluye los roles y permisos del usuario.
+
+- JWT personalizado:
+
+  El token JWT generado contiene:
+
+    - sub (username del usuario)
+
+    - authorities: roles y permisos separados por coma
+
+    - iat, exp, jti, nbf, iss (claims estándar)
+
+- Verificación del token:
+
+  En cada solicitud protegida, el token es validado mediante un filtro personalizado que extrae y verifica la firma del JWT, y carga el usuario autenticado en el SecurityContext.
+
+ - Roles disponibles
+   
+    El sistema define tres roles principales, implementados como un Enum (Rol):
+
+      -Rol	Descripción
+   
+        -ADMIN:	Puede ver y modificar todos los tickets, usuarios y entidades
+   
+        -TECNICO:	Solo puede ver y resolver tickets asignados a él
+   
+        -CLIENTE:	Solo puede ver y crear sus propios tickets
+   
+  Cada rol está asociado a una lista de permisos (PermissionEntity), como READ, CREATE, etc., que se cargan como GrantedAuthorities en Spring Security.
+  
+---
 
 ##  Documentación Swagger
 Disponible en:
