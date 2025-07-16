@@ -6,6 +6,9 @@ import com.helpdesk.helpDesk.response.ApiResponse;
 import com.helpdesk.helpDesk.response.PagedResponse;
 import com.helpdesk.helpDesk.response.Pagination;
 import com.helpdesk.helpDesk.service.ITicketService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -25,12 +29,22 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/ticket")
 @RequiredArgsConstructor
+@Tag(name = "Tickets", description = "Endpoint para las diferentes operaciones")
 public class TicketController {
 
     private final ITicketService ticketService;
-
+    @Operation(
+            summary = "Creacion de Ticket",
+            description = ""
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Ticket creado exitosamente"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "No autorizado"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Ocurrió un error inesperado")
+    })
     @PostMapping("/crear")
-    public ResponseEntity<?> guardar(@RequestBody TicketCreateDTO ticketDTO ) throws URISyntaxException {
+    public ResponseEntity<?> guardar(@RequestBody @Validated  TicketCreateDTO ticketDTO ) throws URISyntaxException {
 
         TicketResponse ticket = ticketService.crearTicket(ticketDTO);
 
@@ -39,6 +53,10 @@ public class TicketController {
         return ResponseEntity.created(new URI("/api/task/" + ticketDTO.getIdTicket())).body(response);
     }
 
+    @Operation(
+            summary = "Actualizacion de Ticket",
+            description = ""
+    )
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody TicketCreateDTO ticketCreateDTO)throws URISyntaxException{
         TicketResponse ticketResponse = ticketService.actualizarTicket(ticketCreateDTO, id);
@@ -48,6 +66,10 @@ public class TicketController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Asignacion de tecnico",
+            description = "Asigna a un tecnico para la resolucion del ticket"
+    )
     @PatchMapping("/asignarTecnico/{id}")
     public ResponseEntity<?> asignarTecnico(@PathVariable Long id, @RequestBody AsignarTecnicoDTO asignarTecnicoDTO)throws URISyntaxException{
         TicketResponse ticketResponse = ticketService.asignarTicketA(id, asignarTecnicoDTO);
@@ -57,6 +79,10 @@ public class TicketController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Actualiza parcialmente un Ticket",
+            description = "Actualiza o modifica el estado de un Ticket"
+    )
     @PatchMapping("/actualizarEstado/{id}")
     public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody ActualizarEstadoDTO nuevoEstado)throws URISyntaxException{
         TicketResponse ticketResponse = ticketService.actualizarEstado(id, nuevoEstado.getNuevoEstado());
@@ -66,13 +92,23 @@ public class TicketController {
         return ResponseEntity.ok(response);
     }
 
+//    @CrossOrigin(origins = "http://localhost:5173",
+//            allowedHeaders = "*",
+//            methods = {RequestMethod.GET, RequestMethod.POST,
+//                    RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+//            allowCredentials = "true")
     @GetMapping("/listado")
     public ResponseEntity<?> listado(){
         return ResponseEntity.ok(ticketService.listadoTicket());
     }
 
 
-
+    @Operation(
+            summary = "Obtiene todos los tickets",
+            description = "Lista tickets con filtros opcionales como estado, prioridad, etc. Incluyendo paginacion y HATEOAS." +
+                    "Ademas tiene filtracion por roles: cliente solo puede ver los tickets que creo," +
+                    "tecnico solo puede acceder a los ticket asignados a el, administrador puede ver todos los tickets"
+    )
     @GetMapping("/tickets")
     public ResponseEntity<PagedResponse<TicketResponse>> listarTickets(@RequestParam(defaultValue = "0") int page, // Número de página (por defecto 0)
                                                                @RequestParam(defaultValue = "5")int size,// Tamaño de página (por defecto 5 elementos por página)
@@ -133,6 +169,11 @@ public class TicketController {
     }
 
 
+    @Operation(
+            summary = "Obtiene ticket por ID",
+            description = "Obtiene ticked por ID, los filtra por roles: cliente solo puede ver los tickets que creo," +
+                    "tecnico solo puede acceder a los ticket asignados a el, administrador puede ver todos los tickets."
+    )
     @GetMapping("/ticket/{id}")
     public ResponseEntity<ApiResponse<TicketDTO>> findById(@PathVariable Long id) {
         TicketDTO ticket = ticketService.ticketPorId(id); // lanza excepción si no existe

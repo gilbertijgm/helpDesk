@@ -21,6 +21,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.time.Duration;
+import java.util.List;
 
 @Configuration // Indicamos que esta clase define configuraciones para el contexto de Spring
 @EnableWebSecurity // Habilita la seguridad web en Spring Security
@@ -31,10 +37,25 @@ public class SecurityConfig {
     // Inyectamos la utilidad que maneja JWT (generación y validación de tokens)
     private final JwtUtil jwtUtils;
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(Duration.ofHours(1));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     // Bean que define la cadena de filtros de seguridad (SecurityFilterChain)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(Customizer.withDefaults())       // usa el bean anterior
                 // Desactiva CSRF porque se trabaja con JWT (stateless)
                 .csrf(csrf -> csrf.disable())
 
@@ -46,8 +67,15 @@ public class SecurityConfig {
 
                 // Define las reglas de autorización por tipo de solicitud y endpoint
                 .authorizeHttpRequests(http -> {
+                    http.requestMatchers(
+                            "/swagger-ui.html",
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/v3/api-docs.yaml"
+                    ).permitAll();
                     // ===== ENDPOINTS PÚBLICOS =====
                     http.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();      // Acceso libre a POST /auth/login
+                    http.requestMatchers(HttpMethod.GET, "/api/ticket/listado").permitAll();
 
                     // ===== ENDPOINTS PRIVADOS (requieren roles) =====
                     http.requestMatchers(HttpMethod.POST, "/auth/signup")
@@ -62,8 +90,7 @@ public class SecurityConfig {
                             .hasAnyRole("ADMIN");
                     http.requestMatchers(HttpMethod.PATCH, "/api/ticket/actualizarEstado/{id}")
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
-                    http.requestMatchers(HttpMethod.GET, "/api/ticket/listado")
-                            .hasAnyRole("ADMIN","CLIENTE","TECNICO");
+
                     http.requestMatchers(HttpMethod.GET, "/api/ticket/tickets")
                             .hasAnyRole("ADMIN","CLIENTE","TECNICO");
                     http.requestMatchers(HttpMethod.GET, "/api/ticket/ticket/{id}")
