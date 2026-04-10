@@ -93,7 +93,7 @@
 1. **Clonar el repositorio**
 
 ```bash
-git clone https://github.com/gilbertijgm/task.git
+git clone https://github.com/gilbertijgm/helpdesk.git
 cd task
 ```
 2. **Configurar base de datos en application.properties**
